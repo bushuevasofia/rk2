@@ -1,1 +1,0 @@
-/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/message_handler_app.dir/link.d CMakeFiles/message_handler_app.dir/app/main.cpp.o -o message_handler_app  libMessageHandler.a
