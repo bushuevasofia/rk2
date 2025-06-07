@@ -1,0 +1,42 @@
+name: Build and Package
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y cmake g++ libgtest-dev dpkg-dev
+
+      - name: Configure CMake
+        run: cmake -B build
+
+      - name: Build project
+        run: cmake --build build
+
+      - name: Run tests
+        run: ctest --test-dir build
+
+      - name: Create DEB package
+        run: |
+          mkdir -p build/deb/usr/bin
+          cp build/message_handler_app build/deb/usr/bin/
+          cd build && dpkg-deb --build deb message_handler.deb
+
+      - name: Upload DEB package
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: build/message_handler.deb
+          asset_name: message_handler.deb
+          asset_content_type: application/vnd.debian.binary-package
