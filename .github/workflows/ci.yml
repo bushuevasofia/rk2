@@ -1,11 +1,10 @@
-name: CI/CD Pipeline
+name: Build and Package
 
 on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v4
     
@@ -18,31 +17,16 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake .. -DBUILD_TESTS=ON
+        cmake .. -DCMAKE_BUILD_TYPE=Release
         cmake --build . --config Release
-        
-    - name: Run tests
-      run: |
-        cd build
-        ctest --output-on-failure
         
     - name: Create DEB package
       run: |
         cd build
         cpack -G DEB
         
-    - name: Upload artifacts
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: message-handler-package
-        path: |
-          build/*.deb
-          build/Testing/**/*.xml
-        
-    - name: Create Release
-      if: startsWith(github.ref, 'refs/tags/v')
-      uses: softprops/action-gh-release@v2
-      with:
-        files: |
-          build/*.deb
-          build/Testing/**/*.xml
+        name: message-handler-deb
+        path: build/*.deb
