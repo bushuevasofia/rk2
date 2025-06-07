@@ -1,0 +1,4 @@
+/home/kali/workspace/projects/rk2/build/CMakeFiles/MessageHandler.dir
+/home/kali/workspace/projects/rk2/build/CMakeFiles/message_handler_app.dir
+/home/kali/workspace/projects/rk2/build/CMakeFiles/edit_cache.dir
+/home/kali/workspace/projects/rk2/build/CMakeFiles/rebuild_cache.dir

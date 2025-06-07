@@ -1,0 +1,2 @@
+/usr/bin/ar qc libMessageHandler.a CMakeFiles/MessageHandler.dir/src/MessageHandler.cpp.o CMakeFiles/MessageHandler.dir/src/DefaultState.cpp.o CMakeFiles/MessageHandler.dir/src/SessionState.cpp.o
+/usr/bin/ranlib libMessageHandler.a
