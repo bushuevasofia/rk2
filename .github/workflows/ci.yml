@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - 'v*'
+      - 'v*'  # Например: v1.0.0, v2.1.0
 
 jobs:
   build-and-test:
@@ -41,31 +41,31 @@ jobs:
           cpack
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: state-pattern-deb
           path: build/*.deb
 
-      - name: Create Release
-        if: github.ref == 'refs/heads/main'
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v1.0.0
-          release_name: Release v1.0.0
-          body: State Pattern implementation with tests
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: Auto-generated release for version ${{ github.ref_name }}
           draft: false
           prerelease: false
 
       - name: Upload Release Asset
-        if: github.ref == 'refs/heads/main'
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/state-pattern-1.0.0-Linux.deb
+          asset_path: build/*.deb
           asset_name: state-pattern.deb
           asset_content_type: application/vnd.debian.binary-package
