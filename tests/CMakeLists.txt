@@ -1,7 +1,12 @@
+# Поиск GTest
 find_package(GTest REQUIRED)
 
-add_executable(test_messagehandler TestMessageHandler.cpp)
-target_link_libraries(test_messagehandler PRIVATE MessageHandler GTest::GTest)
-add_test(NAME test_messagehandler COMMAND test_messagehandler)
+# Тест для DefaultState
+add_executable(test_default_state test_default_state.cpp)
+target_link_libraries(test_default_state state_pattern GTest::GTest GTest::Main)
+add_test(NAME test_default_state COMMAND test_default_state)
 
-# Аналогично для других тестов
+# Тест для SessionState
+add_executable(test_session_state test_session_state.cpp)
+target_link_libraries(test_session_state state_pattern GTest::GTest GTest::Main)
+add_test(NAME test_session_state COMMAND test_session_state)

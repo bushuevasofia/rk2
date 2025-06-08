@@ -1,7 +1,5 @@
-#include "MessageHandler/MessageHandler.h"
-#include "MessageHandler/DefaultState.h"
-
-namespace MessageHandler {
+#include "state_pattern/message_handler.h"
+#include "state_pattern/default_state.h"
 
 MessageHandler::MessageHandler() : state_(std::make_unique<DefaultState>()) {}
 
@@ -11,5 +9,3 @@ void MessageHandler::HandleMessage(const std::string& message) {
         state_ = std::move(newState);
     }
 }
-
-} 

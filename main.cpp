@@ -1,7 +1,8 @@
-#include "MessageHandler/MessageHandler.h"  
-int main()
-{
-    MessageHandler::MessageHandler messageHandler;
+#include "state_pattern/message_handler.h"
+#include <iostream>
+
+int main() {
+    MessageHandler messageHandler;
 
     messageHandler.HandleMessage("asdf");
     messageHandler.HandleMessage("print I'm taeguk.");

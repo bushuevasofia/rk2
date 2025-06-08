@@ -1,41 +1,49 @@
-cmake_minimum_required(VERSION 3.14)
-project(MessageHandler VERSION 1.0 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.11)
+project(state_pattern)
 
-# Обязательные настройки для CPack
-set(CMAKE_CXX_STANDARD 17)
+# Настройка стандарта C++
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-include(GNUInstallDirs)
 
-# Основная библиотека
-add_library(MessageHandler STATIC
-    src/MessageHandler.cpp
-    src/DefaultState.cpp
-    src/SessionState.cpp
-)
-target_include_directories(MessageHandler PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+# Создаем статическую библиотеку
+add_library(state_pattern STATIC
+    src/message_handler.cpp
+    src/default_state.cpp
+    src/session_state.cpp
 )
 
-# Исполняемый файл
-add_executable(message_handler app/main.cpp)
-target_link_libraries(message_handler PRIVATE MessageHandler)
-
-# Установка файлов
-install(TARGETS message_handler
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+# Устанавливаем заголовочные файлы
+target_include_directories(state_pattern PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
 )
 
-install(TARGETS MessageHandler
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+# Создаем исполняемый файл
+add_executable(state_pattern_demo main.cpp)
+target_link_libraries(state_pattern_demo state_pattern)
+
+# Включаем тестирование
+enable_testing()
+
+# Добавляем поддиректорию с тестами
+add_subdirectory(tests)
+
+# Установка
+install(TARGETS state_pattern
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
 )
 
-# Настройка DEB-пакета
-include(InstallRequiredSystemLibraries)
-set(CPACK_PACKAGE_NAME "message-handler")
-set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
-set(CPACK_PACKAGE_CONTACT "Your Name <your.email@example.com>")
-set(CPACK_PACKAGE_DESCRIPTION "Message handler application")
+install(DIRECTORY include/ DESTINATION include)
+install(TARGETS state_pattern_demo RUNTIME DESTINATION bin)
+
+# Настройка CPack для создания DEB пакета
+set(CPACK_PACKAGE_NAME "state-pattern")
+set(CPACK_PACKAGE_VERSION "1.0.0")
+set(CPACK_PACKAGE_DESCRIPTION "State Pattern Implementation")
+set(CPACK_PACKAGE_CONTACT "your.email@example.com")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Your Name")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.27)")
-set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)  # Автоимя файла
+set(CPACK_GENERATOR "DEB")
+
 include(CPack)
