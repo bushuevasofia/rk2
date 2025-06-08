@@ -1,46 +1,71 @@
-name: CI/CD Pipeline
+name: CI Pipeline
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
+    tags:
+      - 'v*'
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential cmake libgtest-dev
-        
-    - name: Build and test
-      run: |
-        mkdir build
-        cd build
-        cmake ..
-        make
-        ctest --output-on-failure
-        
-    - name: Create DEB package
-      run: |
-        cd build
-        cpack
-        
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: state-pattern-deb
-        path: build/state-pattern-1.0.0-Linux.deb
-        
-    - name: Create Release
-      if: github.ref == 'refs/heads/main'
-      uses: softprops/action-gh-release@v1
-      with:
-        files: build/state-pattern-1.0.0-Linux.deb
-        tag_name: v1.0.0
-        name: Release v1.0.0
-        body: State Pattern implementation with tests
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential cmake libgtest-dev dpkg-dev
+
+      - name: Configure CMake
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+
+      - name: Build project
+        run: |
+          cd build
+          make
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest --output-on-failure
+
+      - name: Create DEB package
+        run: |
+          cd build
+          cpack
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: state-pattern-deb
+          path: build/*.deb
+
+      - name: Create Release
+        if: github.ref == 'refs/heads/main'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v1.0.0
+          release_name: Release v1.0.0
+          body: State Pattern implementation with tests
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/state-pattern-1.0.0-Linux.deb
+          asset_name: state-pattern.deb
+          asset_content_type: application/vnd.debian.binary-package
